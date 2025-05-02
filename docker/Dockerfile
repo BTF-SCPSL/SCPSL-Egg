@@ -9,7 +9,8 @@
 FROM ubuntu:latest
 
 # Add Microsoft package repository for .NET 9.0
-RUN curl -sSL https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb -o packages-microsoft-prod.deb && \
+RUN apt-get update && apt-get install -y lsb-release gnupg apt-transport-https && \
+    curl -sSL https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb -o packages-microsoft-prod.deb && \
     dpkg -i packages-microsoft-prod.deb && \
     rm packages-microsoft-prod.deb
 
