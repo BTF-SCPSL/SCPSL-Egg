@@ -10,7 +10,7 @@ echo "###############################################################"
 
 # Install dependencies
 apt-get update
-apt-get install -y curl wget unzip libicu-dev lib32gcc-s1 rsync
+apt-get install -y curl wget unzip libicu-dev lib32gcc-s1 rsync dotnet-sdk-9.0
 apt-get clean
 rm -rf /var/lib/apt/lists/*
 
