@@ -19,7 +19,7 @@ rm -rf /mnt/server/.bin
 
 # Download setup files
 cd /mnt/server
-curl -L https://github.com/Waenara/SCPSL-Egg/archive/refs/heads/main.zip -o repo.zip
+curl -L https://github.com/BTF-SCPSL/SCPSL-Egg/archive/refs/heads/main.zip -o repo.zip
 unzip repo.zip "SCPSL-Egg-main/docker/setup/*" -d .
 rsync -av --ignore-existing SCPSL-Egg-main/docker/setup/ ./
 rm -rf repo.zip SCPSL-Egg-main
