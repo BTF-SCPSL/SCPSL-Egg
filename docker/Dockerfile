@@ -5,12 +5,12 @@
 #                      Fixed by Narin                         #
 ###############################################################
 
-# Уже стабильный LTS, где точно есть .NET 9.0-пакеты
+# Already a stable LTS where .NET 9.0 packages are definitely available
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# 1) Пререквизиты + добавляем Microsoft-репо
+# 1) Prerequisites + add Microsoft package repository
 RUN apt-get update \
  && apt-get install -y \
       curl \
@@ -24,7 +24,7 @@ RUN apt-get update \
  && rm packages-microsoft-prod.deb \
  && rm -rf /var/lib/apt/lists/*
 
-# 2) Устанавливаем все нужные пакеты и .NET SDK 9.0
+# 2) Install all required packages and the .NET SDK 9.0
 RUN apt-get update \
  && apt-get install -y \
       sudo \
@@ -40,7 +40,7 @@ RUN apt-get update \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
-# Создаём пользователя
+# Create a container user
 RUN adduser --disabled-password --home /home/container container
 USER container
 ENV USER=container HOME=/home/container
