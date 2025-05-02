@@ -8,7 +8,7 @@
 # Use the latest Ubuntu image as base
 FROM ubuntu:latest
 
-# Add Microsoft package repo and install .NET 9 prereqs
+# Add Microsoft package repository and install .NET 9 prereqs
 RUN apt-get update && apt-get install -y \
       curl \
       ca-certificates \
@@ -21,10 +21,9 @@ RUN apt-get update && apt-get install -y \
     && dpkg -i packages-microsoft-prod.deb \
     && rm packages-microsoft-prod.deb
 
-# Update the package list and install dependencies
+# Update the package list and install dependencies including .NET SDK 9.0
 RUN apt-get update && apt-get install -y \
     sudo \
-    curl \
     wget \
     unzip \
     adduser \
@@ -33,7 +32,6 @@ RUN apt-get update && apt-get install -y \
     python3-venv \
     libicu-dev \
     lib32gcc-s1 \
-    apt-transport-https \
     dotnet-sdk-9.0 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
