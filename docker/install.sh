@@ -10,7 +10,7 @@ echo "#         Created by Waenara -- waenara.dev@gmail.com         #"
 echo "#                      Fixed by Narin                         #"
 echo "###############################################################"
 
-# Install base dependencies
+# Install dependencies
 apt-get update
 apt-get install -y \
     curl \
@@ -23,35 +23,6 @@ apt-get install -y \
     gnupg \
     lsb-release \
     apt-transport-https
-apt-get clean
-rm -rf /var/lib/apt/lists/*
-
-# Add Microsoft package repository and install .NET 9.0 prerequisites
-echo "###############################################################"
-echo "#            Adding Microsoft package repository             #"
-echo "###############################################################"
-curl -sSL https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb \
-     -o packages-microsoft-prod.deb
-dpkg -i packages-microsoft-prod.deb
-rm packages-microsoft-prod.deb
-
-# Install all dependencies including .NET SDK 9.0
-echo "###############################################################"
-echo "#          Installing dependencies and .NET SDK 9.0          #"
-echo "###############################################################"
-apt-get update
-apt-get install -y \
-    sudo \
-    curl \
-    wget \
-    unzip \
-    adduser \
-    python3 \
-    python3-pip \
-    python3-venv \
-    libicu-dev \
-    lib32gcc-s1 \
-    dotnet-sdk-9.0
 apt-get clean
 rm -rf /var/lib/apt/lists/*
 
@@ -72,17 +43,11 @@ cd /mnt/server/.bin/SteamCMD
 curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
 
 # Download SCP:Secret Laboratory Dedicated Server
-./steamcmd.sh +force_install_dir /mnt/server/.bin/SCPSLDS \
-    +login anonymous \
-    +app_update 996560 -beta "$BETA_NAME" \
-    $( [ "${BETA_PASSWORD:-none}" != "none" ] && echo "-betapassword $BETA_PASSWORD" ) \
-    validate +quit
+./steamcmd.sh +force_install_dir /mnt/server/.bin/SCPSLDS +login anonymous +app_update 996560 \
+    -beta "$BETA_NAME" $( [ "${BETA_PASSWORD:-none}" != "none" ] && echo "-betapassword $BETA_PASSWORD" ) validate +quit
 
-# Download Exiled (dynamic latest asset)
+# Download Exiled
 if [ "${EXILED_INSTALLATION:-0}" -ne 0 ]; then
-    echo "###############################################################"
-    echo "#                     Installing Exiled                     #"
-    echo "###############################################################"
     mkdir -p /mnt/server/.bin/ExiledInstaller
     cd /mnt/server/.bin/ExiledInstaller
 
@@ -100,18 +65,50 @@ if [ "${EXILED_INSTALLATION:-0}" -ne 0 ]; then
     wget -q "$ASSET_URL" -O Exiled.Installer-Linux
     chmod +x Exiled.Installer-Linux
 
-    ./Exiled.Installer-Linux \
-      --path /mnt/server/.bin/SCPSLDS \
-      --appdata /mnt/server/.config/ \
-      --exiled /mnt/server/.config/ \
+    ./Exiled.Installer-Linux --path /mnt/server/.bin/SCPSLDS \
+      --appdata /mnt/server/.config/ --exiled /mnt/server/.config/ \
       $([ "${EXILED_INSTALLATION}" -eq 2 ] && echo --pre-releases)
 fi
 
+# === Установка .NET SDK 9.0 ===
+echo "###############################################################"
+echo "#              Installing .NET SDK 9.0 Runtime              #"
+echo "###############################################################"
+
+# (1) Снова обновляем и ставим пререквизиты, чтобы гарантированно были curl, gnupg, lsb-release и т.д.
+apt-get update
+apt-get install -y \
+    curl \
+    ca-certificates \
+    gnupg \
+    lsb-release \
+    apt-transport-https
+rm -rf /var/lib/apt/lists/*
+
+# (2) Хардкодим Ubuntu 22.04 repo для .NET 9.0
+curl -sSL https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb \
+     -o packages-microsoft-prod.deb
+dpkg -i packages-microsoft-prod.deb
+rm packages-microsoft-prod.deb
+
+# (3) Устанавливаем .NET SDK 9.0 вместе с остальными зависимостями
+apt-get update
+apt-get install -y \
+    sudo \
+    wget \
+    unzip \
+    adduser \
+    python3 \
+    python3-pip \
+    python3-venv \
+    libicu-dev \
+    lib32gcc-s1 \
+    dotnet-sdk-9.0
+apt-get clean
+rm -rf /var/lib/apt/lists/*
+
 # Install Discord bot
 if [ "${SCPDISCORD_INSTALLATION:-0}" -eq 1 ]; then
-    echo "###############################################################"
-    echo "#                   Installing SCPDiscord                   #"
-    echo "###############################################################"
     mkdir -p /mnt/server/.bin/SCPDiscord
     cd /mnt/server/.bin/SCPDiscord
     wget -q https://github.com/KarlOfDuty/SCPDiscord/releases/latest/download/SCPDiscordBot_Linux
