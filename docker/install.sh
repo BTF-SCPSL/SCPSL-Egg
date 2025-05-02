@@ -5,6 +5,7 @@ echo "###############################################################"
 echo "#                     Waenara / SCPSL-Egg                     #"
 echo "#   Pterodactyl egg for simplified SCP:SL server management   #"
 echo "#         Created by Waenara -- waenara.dev@gmail.com         #"
+echo "#                      Fixed by Narin                         #"
 echo "###############################################################"
 
 # Install dependencies
