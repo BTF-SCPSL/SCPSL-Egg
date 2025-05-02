@@ -42,9 +42,31 @@ mkdir -p /mnt/server/.bin/SteamCMD
 cd /mnt/server/.bin/SteamCMD
 curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
 
-# Download SCP:Secret Laboratory Dedicated Server
-./steamcmd.sh +force_install_dir /mnt/server/.bin/SCPSLDS +login anonymous +app_update 996560 \
-    -beta "$BETA_NAME" $( [ "${BETA_PASSWORD:-none}" != "none" ] && echo "-betapassword $BETA_PASSWORD" ) validate +quit
+# === Download SCP:Secret Laboratory Dedicated Server ===
+echo "###############################################################"
+echo "#             Downloading SCP:SL Dedicated Server            #"
+echo "###############################################################"
+
+# Подстрахуемся, чтобы переменные были всегда объявлены
+: "${BETA_NAME:=}"
+: "${BETA_PASSWORD:=}"
+
+# Отключаем exit-on-error для steamcmd
+set +e
+/mnt/server/.bin/SteamCMD/steamcmd.sh \
+    +force_install_dir /mnt/server/.bin/SCPSLDS \
+    +login anonymous \
+    +app_update 996560 \
+    ${BETA_NAME:+-beta ${BETA_NAME}} \
+    ${BETA_PASSWORD:+-betapassword ${BETA_PASSWORD}} \
+    validate +quit
+STEAM_EXIT=$?
+# Включаем exit-on-error обратно
+set -e
+
+if [ $STEAM_EXIT -ne 0 ]; then
+  echo "⚠️ Warning: SteamCMD exited with code $STEAM_EXIT — continuing installation anyway"
+fi
 
 # Download Exiled
 if [ "${EXILED_INSTALLATION:-0}" -ne 0 ]; then
@@ -108,7 +130,7 @@ apt-get clean
 rm -rf /var/lib/apt/lists/*
 
 # Install Discord bot
-if [ "${SCPDISCORD_INSTALLATION:-0}" -eq 1 ]; then
+if [ "$SCPDISCORD_INSTALLATION" -eq 1 ]; then
     mkdir -p /mnt/server/.bin/SCPDiscord
     cd /mnt/server/.bin/SCPDiscord
     wget -q https://github.com/KarlOfDuty/SCPDiscord/releases/latest/download/SCPDiscordBot_Linux
