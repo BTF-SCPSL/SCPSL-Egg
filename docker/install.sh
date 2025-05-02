@@ -42,6 +42,28 @@ if [ "$EXILED_INSTALLATION" -ne 0 ]; then
     ./Exiled.Installer-Linux --path /mnt/server/.bin/SCPSLDS --appdata /mnt/server/.config/ --exiled /mnt/server/.config/ $([ "$EXILED_INSTALLATION" -eq 2 ] && echo --pre-releases)
 fi
 
+# Download .NET 9.0.0 for SCPDiscord
+echo "Adding Microsoft package repository for .NET"
+curl -sSL "https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb" \
+     -o packages-microsoft-prod.deb
+dpkg -i packages-microsoft-prod.deb
+rm packages-microsoft-prod.deb
+
+echo "Updating package lists"
+apt-get update
+
+echo "Installing APT HTTPS transport"
+apt-get install -y apt-transport-https
+
+echo "Updating package lists again"
+apt-get update
+
+echo "Installing .NET 9.0 Runtime"
+apt-get install -y dotnet-runtime-9.0
+
+echo "Listing installed .NET runtimes:"
+dotnet --list-runtimes
+
 # Install Discord bot
 if [ "$SCPDISCORD_INSTALLATION" -eq 1 ]; then
     mkdir -p /mnt/server/.bin/SCPDiscord
