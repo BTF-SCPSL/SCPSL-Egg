@@ -2,10 +2,16 @@
 #                     Waenara / SCPSL-Egg                     #
 #   Pterodactyl egg for simplified SCP:SL server management   #
 #         Created by Waenara -- waenara.dev@gmail.com         #
+#                      Fixed by Narin                         #
 ###############################################################
 
 # Use the latest Ubuntu image as base
 FROM ubuntu:latest
+
+# Add Microsoft package repository for .NET 9.0
+RUN curl -sSL https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb -o packages-microsoft-prod.deb && \
+    dpkg -i packages-microsoft-prod.deb && \
+    rm packages-microsoft-prod.deb
 
 # Update the package list and install dependencies
 RUN apt-get update && apt-get install -y \
@@ -19,7 +25,8 @@ RUN apt-get update && apt-get install -y \
     python3-venv \
     libicu-dev \
     lib32gcc-s1 \
-    dotnet-sdk-8.0 \
+    apt-transport-https \
+    dotnet-sdk-9.0 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
