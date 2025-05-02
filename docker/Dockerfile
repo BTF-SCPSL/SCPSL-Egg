@@ -8,11 +8,18 @@
 # Use the latest Ubuntu image as base
 FROM ubuntu:latest
 
-# Add Microsoft package repository for .NET 9.0
-RUN apt-get update && apt-get install -y lsb-release gnupg apt-transport-https && \
-    curl -sSL https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb -o packages-microsoft-prod.deb && \
-    dpkg -i packages-microsoft-prod.deb && \
-    rm packages-microsoft-prod.deb
+# Add Microsoft package repo and install .NET 9 prereqs
+RUN apt-get update && apt-get install -y \
+      curl \
+      ca-certificates \
+      gnupg \
+      lsb-release \
+      apt-transport-https \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -sSL https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb \
+         -o packages-microsoft-prod.deb \
+    && dpkg -i packages-microsoft-prod.deb \
+    && rm packages-microsoft-prod.deb
 
 # Update the package list and install dependencies
 RUN apt-get update && apt-get install -y \
